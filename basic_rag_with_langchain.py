@@ -1,6 +1,6 @@
 import os
 import bs4
-from langchain_community.document_loaders import WebBaseLoader
+from langchain_community.document_loaders import WebBaseLoader, PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_openai import AzureOpenAIEmbeddings
 from langchain.vectorstores import Chroma
@@ -20,15 +20,21 @@ AZURE_OPENAI_API_VERSION = os.getenv("AZURE_OPENAI_API_VERSION")
 #### INDEXING ####
 
 # Load blog
-loader = WebBaseLoader(
-    web_paths=("https://lilianweng.github.io/posts/2023-06-23-agent/",),
-    bs_kwargs=dict(
-        parse_only=bs4.SoupStrainer(
-            class_=("post-content", "post-title", "post-header")
-        )
-    ),
-)
-blog_docs = loader.load()
+# loader = WebBaseLoader(
+#     web_paths=("https://lilianweng.github.io/posts/2023-06-23-agent/",),
+#     bs_kwargs=dict(
+#         parse_only=bs4.SoupStrainer(
+#             class_=("post-content", "post-title", "post-header")
+#         )
+#     ),
+# )
+# docs = loader.load()
+
+# Load PDF
+file_path = "./data/overview_of_llms.pdf"
+loader = PyPDFLoader(file_path)
+
+docs = loader.load()
 
 # Split
 text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
@@ -36,7 +42,7 @@ text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
     chunk_overlap=50)
 
 # Make splits
-splits = text_splitter.split_documents(blog_docs)
+splits = text_splitter.split_documents(docs)
 
 #### RETREIVAL ####
 
@@ -81,7 +87,7 @@ rag_chain = (
 )
 
 
-# question = "What is Task Decomposition?"
+# question = "What are large language models?"
 question = input("Ask question: ")
 
 print("Answer:", rag_chain.invoke(question))

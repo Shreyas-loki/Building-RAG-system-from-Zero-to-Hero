@@ -2,8 +2,9 @@ langchain_community==0.0.33
 langchain-openai 
 langchainhub 
 chromadb 
-langchain==0.1.16 
+langchain-community
 tiktoken 
 openai
 python-dotenv
 beautifulsoup4
+pypdf
