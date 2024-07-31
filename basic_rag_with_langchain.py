@@ -32,7 +32,7 @@ EMBEDDING_MODEL = "ada0021_6"
 # docs = loader.load()
 
 # Load PDF
-file_path = "overview_of_llms.pdf"
+file_path = "./data/overview_of_llms.pdf"
 loader = PyPDFLoader(file_path)
 
 docs = loader.load()
@@ -90,7 +90,6 @@ rag_chain = (
 # question = "What are large language models?"
 while True:
     question = input("\nAsk question: ")
-
     print("\nAnswer:", rag_chain.invoke(question))
 
     choice = input("\n\nDo you wish to continue the chat? (Y/N): ")
