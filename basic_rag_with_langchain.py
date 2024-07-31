@@ -1,9 +1,9 @@
 import os
 import bs4
 from langchain_community.document_loaders import WebBaseLoader, PyPDFLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_openai import AzureOpenAIEmbeddings
-from langchain.vectorstores import Chroma
+from langchain_chroma import Chroma
 from langchain_openai import AzureChatOpenAI
 from langchain_core.output_parsers import StrOutputParser
 from langchain import hub
@@ -15,7 +15,8 @@ load_dotenv()
 AZURE_OPENAI_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT")
 AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
 AZURE_OPENAI_API_VERSION = os.getenv("AZURE_OPENAI_API_VERSION")
-
+LLM_MODEL = "gpt35turbo"
+EMBEDDING_MODEL = "ada0021_6"
 
 #### INDEXING ####
 
@@ -31,7 +32,7 @@ AZURE_OPENAI_API_VERSION = os.getenv("AZURE_OPENAI_API_VERSION")
 # docs = loader.load()
 
 # Load PDF
-file_path = "./data/overview_of_llms.pdf"
+file_path = "overview_of_llms.pdf"
 loader = PyPDFLoader(file_path)
 
 docs = loader.load()
@@ -47,7 +48,7 @@ splits = text_splitter.split_documents(docs)
 #### RETREIVAL ####
 
 vectorstore = Chroma.from_documents(documents=splits,
-                                    embedding=AzureOpenAIEmbeddings(azure_deployment="ada0021_6",
+                                    embedding=AzureOpenAIEmbeddings(azure_deployment=EMBEDDING_MODEL,
                                                                     openai_api_version=AZURE_OPENAI_API_VERSION,
                                                                     chunk_size=1)
                                    )
@@ -60,7 +61,7 @@ llm = AzureChatOpenAI(
             openai_api_version=AZURE_OPENAI_API_VERSION,
             openai_api_key=AZURE_OPENAI_API_KEY,
             azure_endpoint=AZURE_OPENAI_ENDPOINT,
-            deployment_name="gpt35turbo",
+            deployment_name=LLM_MODEL,
             temperature=0
         )
 
@@ -86,8 +87,17 @@ rag_chain = (
     | StrOutputParser()
 )
 
-
 # question = "What are large language models?"
-question = input("Ask question: ")
+while True:
+    question = input("\nAsk question: ")
 
-print("Answer:", rag_chain.invoke(question))
+    print("\nAnswer:", rag_chain.invoke(question))
+
+    choice = input("\n\nDo you wish to continue the chat? (Y/N): ")
+    
+    if choice.lower() == 'y':
+        continue
+    break
+
+#### MODEL EVALUATION CODE GOES HERE ####
+# https://towardsdatascience.com/evaluating-rag-applications-with-ragas-81d67b0ee31a

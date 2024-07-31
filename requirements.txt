@@ -1,9 +1,9 @@
-langchain_community==0.0.33 
 langchain-openai 
 langchainhub 
-chromadb 
+langchain-chroma
 langchain-community
-tiktoken 
+langchain-text-splitters
+tiktoken
 openai
 python-dotenv
 beautifulsoup4
